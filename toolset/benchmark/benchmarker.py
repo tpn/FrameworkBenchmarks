@@ -228,11 +228,16 @@ class Benchmarker:
   ############################################################
   # report_results
   ############################################################
-  def report_results(self, framework, test, results):
+  def report_results(self, framework, test, results, passed=True):
     if test not in self.results['rawData'].keys():
       self.results['rawData'][test] = dict()
 
     self.results['rawData'][test][framework.name] = results
+
+    if passed:
+      self.results['succeeded'][test].append(framework.name)
+    else:
+      self.results['failed'][test].append(framework.name)
 
   ############################################################
   # End report_results
@@ -624,7 +629,8 @@ class Benchmarker:
           Subprocess Error {name}
         -----------------------------------------------------
         {err}
-        """.format(name=test.name, err=e)) )
+        {trace}
+        """.format(name=test.name, err=e, trace=sys.exc_info()[:2])) )
         err.flush()
         try:
           test.stop(out, err)
@@ -635,17 +641,17 @@ class Benchmarker:
             Subprocess Error: Test .stop() raised exception {name}
           -----------------------------------------------------
           {err}
-          """.format(name=test.name, err=e)) )
+          {trace}
+          """.format(name=test.name, err=e, trace=sys.exc_info()[:2])) )
           err.flush()
       except (KeyboardInterrupt, SystemExit) as e:
         test.stop(out)
-        err.write( """
+        out.write( """
         -----------------------------------------------------
           Cleaning up....
         -----------------------------------------------------
-        {err}
-        """.format(err=e) )
-        err.flush()
+        """)
+        out.flush()
         self.__finish()
         sys.exit()
 
@@ -883,6 +889,20 @@ class Benchmarker:
       self.results['rawData']['update'] = dict()
       self.results['rawData']['plaintext'] = dict()
       self.results['completed'] = dict()
+      self.results['succeeded'] = dict()
+      self.results['succeeded']['json'] = []
+      self.results['succeeded']['db'] = []
+      self.results['succeeded']['query'] = []
+      self.results['succeeded']['fortune'] = []
+      self.results['succeeded']['update'] = []
+      self.results['succeeded']['plaintext'] = []
+      self.results['failed'] = dict()
+      self.results['failed']['json'] = []
+      self.results['failed']['db'] = []
+      self.results['failed']['query'] = []
+      self.results['failed']['fortune'] = []
+      self.results['failed']['update'] = []
+      self.results['failed']['plaintext'] = []
     else:
       #for x in self.__gather_tests():
       #  if x.name not in self.results['frameworks']:

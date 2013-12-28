@@ -12,7 +12,7 @@ var app = exports.app = Application();
 app.configure("params", "route");
 
 app.get('/json', function() {
-   var helloObject = {message: "Hello, world"};
+   var helloObject = {message: "Hello, World!"};
    return response.json(helloObject);
 });
 
@@ -44,7 +44,7 @@ app.get('/plaintext', function() {
    return {
      status: 200,
      headers: {"Content-Type": 'text/plain'},
-     body: ['Hello World']
+     body: ['Hello, World!']
    };
 });
 

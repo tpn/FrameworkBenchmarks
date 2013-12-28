@@ -22,7 +22,7 @@ class HelloController {
     // Test type 1: JSON serialization
     def json() {
         def msg = [
-            message: "Hello, world"
+            message: "Hello, World!"
         ]
         render msg as JSON
     }
@@ -96,6 +96,6 @@ class HelloController {
     
     // Test type 6: Plaintext
     def plaintext() {
-        render text:'Hello, world', contentType:'text/plain'
+        render text:'Hello, World!', contentType:'text/plain'
     }
 }

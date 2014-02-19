@@ -1,11 +1,10 @@
 package hello;
 
-import io.undertow.server.HttpHandler;
-import io.undertow.server.HttpServerExchange;
-import io.undertow.util.Headers;
-import java.nio.ByteBuffer;
+import static hello.HelloWebServer.*;
+import io.undertow.server.*;
+import io.undertow.util.*;
 
-import static hello.HelloWebServer.TEXT_PLAIN;
+import java.nio.*;
 
 /**
  * Handles the plaintext test.

@@ -1,27 +1,19 @@
 package hello;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.MustacheFactory;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.net.MediaType;
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
-import io.undertow.Handlers;
-import io.undertow.Undertow;
-import io.undertow.UndertowOptions;
-import io.undertow.util.Headers;
+import io.undertow.*;
+import io.undertow.util.*;
 
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Properties;
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+
+import javax.sql.*;
+
+import com.fasterxml.jackson.databind.*;
+import com.github.mustachejava.*;
+import com.google.common.cache.*;
+import com.google.common.net.*;
+import com.mongodb.*;
 
 /**
  * An implementation of the TechEmpower benchmark tests using the Undertow web
@@ -148,6 +140,8 @@ public final class HelloWebServer {
             .addPrefixPath("/updates/mongodb",
                 new UpdatesMongoHandler(objectMapper, mongodb))
             .addPrefixPath("/plaintext",
+                new PlaintextHandler())
+            .addPrefixPath("/byte",
                 new PlaintextHandler())
             .addPrefixPath("/cache",
                 new CacheHandler(objectMapper, worldCache)),

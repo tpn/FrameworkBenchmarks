@@ -142,7 +142,7 @@ public final class HelloWebServer {
             .addPrefixPath("/plaintext",
                 new PlaintextHandler())
             .addPrefixPath("/byte",
-                new PlaintextHandler())
+                new ByteHandler())
             .addPrefixPath("/cache",
                 new CacheHandler(objectMapper, worldCache)),
             Headers.SERVER_STRING, "U-tow")))

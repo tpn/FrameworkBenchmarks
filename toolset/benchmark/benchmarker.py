@@ -646,7 +646,7 @@ class Benchmarker:
             -----------------------------------------------------
             """.format(name=test.name, port=str(test.port))) )
           err.flush()
-          self.__forciblyEndPortBoundProcesses(test, out, err)
+          self.__forciblyEndPortBoundProcesses()
 
         out.write( textwrap.dedent("""
         -----------------------------------------------------
@@ -691,7 +691,7 @@ class Benchmarker:
               -----------------------------------------------------
               """.format(name=test.name, port=str(test.port))) )
             err.flush()
-            self.__forciblyEndPortBoundProcesses(test, out, err)
+            self.__forciblyEndPortBoundProcesses()
 
         except (subprocess.CalledProcessError) as e:
           self.__write_intermediate_results(test.name,"<setup.py>#stop() raised an error")
@@ -703,6 +703,8 @@ class Benchmarker:
           {trace}
           """.format(name=test.name, err=e, trace=sys.exc_info()[:2])) )
           err.flush()
+          self.__forciblyEndPortBoundProcesses()
+
       except (KeyboardInterrupt, SystemExit) as e:
         test.stop(out, err)
         out.flush()
@@ -717,7 +719,8 @@ class Benchmarker:
             -----------------------------------------------------
             """.format(name=test.name, port=str(test.port))) )
           err.flush()
-          self.__forciblyEndPortBoundProcesses(test, out, err)
+          self.__forciblyEndPortBoundProcesses()
+
         out.write( """
         -----------------------------------------------------
           Cleaning up....
@@ -771,7 +774,7 @@ class Benchmarker:
   # End __is_port_bound
   ############################################################
 
-  def __forciblyEndPortBoundProcesses(self, test, out, err):
+  def __forciblyEndPortBoundProcesses(self):
     p = subprocess.Popen(['sudo', 'netstat', '-lnp'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     for line in out.splitlines():
@@ -783,8 +786,10 @@ class Benchmarker:
           try:
             pid = splitline[6].split('/')[0]
             if type(pid) == int:
+              print "Going to kill pid: {pid}".format(pid=pid)
               os.kill(pid, 15)
           except OSError:
+            print "Error killing a pid"
             # This is okay; likely we killed a parent that ended
             # up automatically killing this before we could.
             pass

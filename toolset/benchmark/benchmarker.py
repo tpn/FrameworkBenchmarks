@@ -778,21 +778,16 @@ class Benchmarker:
       if 'tcp' in line:
         splitline = line.split()
         port = splitline[3].split(':')
-        port = port[port.length - 1]
-        print "Port: {port}".format(port=port)
+        port = port[len(port) - 1]
         if port > 6000:
           try:
             pid = splitline[6].split('/')[0]
-            print "Pid: {pid}".format(pid=pid)
             if type(pid) == int:
-              err.write( textwrap.dedent("""
-                PID: {pid}
-                """.format(pid=pid)) )
-              err.flush()
-              #os.kill(pid, 15)
+              os.kill(pid, 15)
           except OSError:
+            # This is okay; likely we killed a parent that ended
+            # up automatically killing this before we could.
             pass
-            #ret = 1
 
 
   ############################################################

@@ -632,7 +632,8 @@ class Benchmarker:
         -----------------------------------------------------
         """.format(name=test.name)) )
         out.flush()
-        test.stop(out, err)
+        # TODO - uncomment after testing
+        #test.stop(out, err)
         out.flush()
         err.flush()
         time.sleep(5)
@@ -645,7 +646,7 @@ class Benchmarker:
             -----------------------------------------------------
             """.format(name=test.name, port=str(test.port))) )
           err.flush()
-          return
+          self.__forciblyEndPortBoundProcesses(test, out, err)
 
         out.write( textwrap.dedent("""
         -----------------------------------------------------
@@ -742,6 +743,19 @@ class Benchmarker:
   ############################################################
   # End __is_port_bound
   ############################################################
+
+  def __forciblyEndPortBoundProcesses(self, test, out, err):
+    p = subprocess.Popen(['netstat', '-lnp'], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    for line in out.splitlines():
+      if 'tcp' in line:
+        try:
+          pid = int(line.split(None, 2)[1])
+          print "PID: {pid}".format(pid=pid)
+          #os.kill(pid, 15)
+        except OSError:
+          #ret = 1
+
 
   ############################################################
   # __parse_results

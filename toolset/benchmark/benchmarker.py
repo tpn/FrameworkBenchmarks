@@ -781,10 +781,10 @@ class Benchmarker:
       if 'tcp' in line:
         splitline = line.split()
         port = splitline[3].split(':')
-        port = port[len(port) - 1].strip()
+        port = int(port[len(port) - 1].strip())
         if port > 6000:
           try:
-            pid = splitline[6].split('/')[0].strip()
+            pid = int(splitline[6].split('/')[0].strip())
             print "Going to kill pid: {pid}".format(pid=pid)
             os.kill(pid, 15)
           except OSError:

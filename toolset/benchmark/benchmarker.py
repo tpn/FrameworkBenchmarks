@@ -777,7 +777,7 @@ class Benchmarker:
     for line in out.splitlines():
       if 'tcp' in line:
         splitline = line.split()
-        if  splitline[3].split(':')[1] > 6000
+        if splitline[3].split(':')[1] > 6000:
           try:
             pid = int(splitline[6].split('/')[0])
             err.write( textwrap.dedent("""

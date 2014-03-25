@@ -632,8 +632,7 @@ class Benchmarker:
         -----------------------------------------------------
         """.format(name=test.name)) )
         out.flush()
-        # TODO - uncomment after testing
-        #test.stop(out, err)
+        test.stop(out, err)
         out.flush()
         err.flush()
         time.sleep(5)

@@ -782,7 +782,7 @@ class Benchmarker:
             pid = int(splitline[6].split('/')[0])
             err.write( textwrap.dedent("""
               PID: {pid}
-              """.format(pid=pid))
+              """.format(pid=pid)) )
             #os.kill(pid, 15)
           except OSError:
             pass

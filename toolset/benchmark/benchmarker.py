@@ -777,7 +777,8 @@ class Benchmarker:
     for line in out.splitlines():
       if 'tcp' in line:
         splitline = line.split()
-        port = splitline[3].split(':')[1]
+        port = splitline[3].split(':')
+        port = port[port.length - 1]
         print "Port: {port}".format(port=port)
         if port > 6000:
           try:
@@ -787,6 +788,7 @@ class Benchmarker:
               err.write( textwrap.dedent("""
                 PID: {pid}
                 """.format(pid=pid)) )
+              err.flush()
               #os.kill(pid, 15)
           except OSError:
             pass

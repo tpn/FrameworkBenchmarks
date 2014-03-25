@@ -777,13 +777,15 @@ class Benchmarker:
     for line in out.splitlines():
       if 'tcp' in line:
         splitline = line.split()
-        if splitline[3].split(':')[1] > 6000:
+        port = splitline[3].split(':')[1]
+        if port > 6000:
           try:
-            pid = int(splitline[6].split('/')[0])
-            err.write( textwrap.dedent("""
-              PID: {pid}
-              """.format(pid=pid)) )
-            #os.kill(pid, 15)
+            pid = splitline[6].split('/')[0]
+            if type(pid) == int:
+              err.write( textwrap.dedent("""
+                PID: {pid}
+                """.format(pid=pid)) )
+              #os.kill(pid, 15)
           except OSError:
             pass
             #ret = 1

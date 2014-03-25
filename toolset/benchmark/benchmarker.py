@@ -640,13 +640,14 @@ class Benchmarker:
 
         if self.__is_port_bound(test.port):
           self.__write_intermediate_results(test.name, "port " + str(test.port) + " was not released by stop")
-          err.write( textwrap.dedent("""
-            -----------------------------------------------------
-              Error: Port {port} was not released by stop {name}
-            -----------------------------------------------------
-            """.format(name=test.name, port=str(test.port))) )
-          err.flush()
           self.__forciblyEndPortBoundProcesses()
+          if self.__is_port_bound(test.port):
+            err.write( textwrap.dedent("""
+              -----------------------------------------------------
+                Error: Port {port} was not released by stop {name}
+              -----------------------------------------------------
+              """.format(name=test.name, port=str(test.port))) )
+            err.flush()
 
         out.write( textwrap.dedent("""
         -----------------------------------------------------
@@ -685,13 +686,14 @@ class Benchmarker:
 
           if self.__is_port_bound(test.port):
             self.__write_intermediate_results(test.name, "port " + str(test.port) + " was not released by stop")
-            err.write( textwrap.dedent("""
-              -----------------------------------------------------
-                Error: Port {port} was not released by stop {name}
-              -----------------------------------------------------
-              """.format(name=test.name, port=str(test.port))) )
-            err.flush()
             self.__forciblyEndPortBoundProcesses()
+            if self.__is_port_bound(test.port):
+              err.write( textwrap.dedent("""
+                -----------------------------------------------------
+                  Error: Port {port} was not released by stop {name}
+                -----------------------------------------------------
+                """.format(name=test.name, port=str(test.port))) )
+              err.flush()
 
         except (subprocess.CalledProcessError) as e:
           self.__write_intermediate_results(test.name,"<setup.py>#stop() raised an error")
@@ -704,6 +706,13 @@ class Benchmarker:
           """.format(name=test.name, err=e, trace=sys.exc_info()[:2])) )
           err.flush()
           self.__forciblyEndPortBoundProcesses()
+          if self.__is_port_bound(test.port):
+            err.write( textwrap.dedent("""
+              -----------------------------------------------------
+                Error: Port {port} was not released by stop {name}
+              -----------------------------------------------------
+              """.format(name=test.name, port=str(test.port))) )
+            err.flush()
 
       except (KeyboardInterrupt, SystemExit) as e:
         test.stop(out, err)
@@ -713,13 +722,14 @@ class Benchmarker:
 
         if self.__is_port_bound(test.port):
           self.__write_intermediate_results(test.name, "port " + str(test.port) + " was not released by stop")
-          err.write( textwrap.dedent("""
-            -----------------------------------------------------
-              Error: Port {port} was not released by stop {name}
-            -----------------------------------------------------
-            """.format(name=test.name, port=str(test.port))) )
-          err.flush()
           self.__forciblyEndPortBoundProcesses()
+          if self.__is_port_bound(test.port):
+            err.write( textwrap.dedent("""
+              -----------------------------------------------------
+                Error: Port {port} was not released by stop {name}
+              -----------------------------------------------------
+              """.format(name=test.name, port=str(test.port))) )
+            err.flush()
 
         out.write( """
         -----------------------------------------------------
@@ -783,10 +793,8 @@ class Benchmarker:
         port = splitline[3].split(':')
         port = int(port[len(port) - 1].strip())
         if port > 6000:
-          print "Port > 6000: {port}".format(port=port)
           try:
             pid = int(splitline[6].split('/')[0].strip())
-            print "Going to kill pid: {pid}".format(pid=pid)
             os.kill(pid, 15)
           except OSError:
             print "Error killing a pid"

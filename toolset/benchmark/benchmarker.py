@@ -679,6 +679,20 @@ class Benchmarker:
         err.flush()
         try:
           test.stop(out, err)
+          out.flush()
+          err.flush()
+          time.sleep(5)
+
+          if self.__is_port_bound(test.port):
+            self.__write_intermediate_results(test.name, "port " + str(test.port) + " was not released by stop")
+            err.write( textwrap.dedent("""
+              -----------------------------------------------------
+                Error: Port {port} was not released by stop {name}
+              -----------------------------------------------------
+              """.format(name=test.name, port=str(test.port))) )
+            err.flush()
+            self.__forciblyEndPortBoundProcesses(test, out, err)
+
         except (subprocess.CalledProcessError) as e:
           self.__write_intermediate_results(test.name,"<setup.py>#stop() raised an error")
           err.write( textwrap.dedent("""
@@ -690,7 +704,20 @@ class Benchmarker:
           """.format(name=test.name, err=e, trace=sys.exc_info()[:2])) )
           err.flush()
       except (KeyboardInterrupt, SystemExit) as e:
-        test.stop(out)
+        test.stop(out, err)
+        out.flush()
+        err.flush()
+        time.sleep(5)
+
+        if self.__is_port_bound(test.port):
+          self.__write_intermediate_results(test.name, "port " + str(test.port) + " was not released by stop")
+          err.write( textwrap.dedent("""
+            -----------------------------------------------------
+              Error: Port {port} was not released by stop {name}
+            -----------------------------------------------------
+            """.format(name=test.name, port=str(test.port))) )
+          err.flush()
+          self.__forciblyEndPortBoundProcesses(test, out, err)
         out.write( """
         -----------------------------------------------------
           Cleaning up....
@@ -749,12 +776,16 @@ class Benchmarker:
     out, err = p.communicate()
     for line in out.splitlines():
       if 'tcp' in line:
-        try:
-          pid = int(line.split(None, 2)[1])
-          print "PID: {pid}".format(pid=pid)
-          #os.kill(pid, 15)
-        except OSError:
-          #ret = 1
+        splitline = line.split()
+        if  splitline[3].split(':')[1] > 6000
+          try:
+            pid = int(splitline[6].split('/')[0])
+            err.write( textwrap.dedent("""
+              PID: {pid}
+              """.format(pid=pid))
+            #os.kill(pid, 15)
+          except OSError:
+            #ret = 1
 
 
   ############################################################

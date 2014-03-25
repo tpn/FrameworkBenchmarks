@@ -783,6 +783,7 @@ class Benchmarker:
         port = splitline[3].split(':')
         port = int(port[len(port) - 1].strip())
         if port > 6000:
+          print "Port > 6000: {port}".format(port=port)
           try:
             pid = int(splitline[6].split('/')[0].strip())
             print "Going to kill pid: {pid}".format(pid=pid)

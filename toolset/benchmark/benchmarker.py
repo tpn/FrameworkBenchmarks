@@ -785,9 +785,8 @@ class Benchmarker:
         if port > 6000:
           try:
             pid = splitline[6].split('/')[0]
-            if type(pid) == int:
-              print "Going to kill pid: {pid}".format(pid=pid)
-              os.kill(pid, 15)
+            print "Going to kill pid: {pid}".format(pid=pid)
+            os.kill(pid, 15)
           except OSError:
             print "Error killing a pid"
             # This is okay; likely we killed a parent that ended

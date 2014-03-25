@@ -641,6 +641,7 @@ class Benchmarker:
         if self.__is_port_bound(test.port):
           self.__write_intermediate_results(test.name, "port " + str(test.port) + " was not released by stop")
           self.__forciblyEndPortBoundProcesses()
+          time.sleep(5)
           if self.__is_port_bound(test.port):
             err.write( textwrap.dedent("""
               -----------------------------------------------------
@@ -687,6 +688,7 @@ class Benchmarker:
           if self.__is_port_bound(test.port):
             self.__write_intermediate_results(test.name, "port " + str(test.port) + " was not released by stop")
             self.__forciblyEndPortBoundProcesses()
+            time.sleep(5)
             if self.__is_port_bound(test.port):
               err.write( textwrap.dedent("""
                 -----------------------------------------------------
@@ -706,6 +708,7 @@ class Benchmarker:
           """.format(name=test.name, err=e, trace=sys.exc_info()[:2])) )
           err.flush()
           self.__forciblyEndPortBoundProcesses()
+          time.sleep(5)
           if self.__is_port_bound(test.port):
             err.write( textwrap.dedent("""
               -----------------------------------------------------
@@ -723,6 +726,7 @@ class Benchmarker:
         if self.__is_port_bound(test.port):
           self.__write_intermediate_results(test.name, "port " + str(test.port) + " was not released by stop")
           self.__forciblyEndPortBoundProcesses()
+          time.sleep(5)
           if self.__is_port_bound(test.port):
             err.write( textwrap.dedent("""
               -----------------------------------------------------

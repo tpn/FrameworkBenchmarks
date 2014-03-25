@@ -785,6 +785,7 @@ class Benchmarker:
               """.format(pid=pid))
             #os.kill(pid, 15)
           except OSError:
+            pass
             #ret = 1
 
 

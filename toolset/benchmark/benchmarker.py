@@ -817,7 +817,6 @@ class Benchmarker:
               """.format(pid=str(pid)) )
             # This is okay; likely we killed a parent that ended
             # up automatically killing this before we could.
-            pass
 
 
   ############################################################

@@ -639,7 +639,7 @@ class Benchmarker:
 
         if self.__is_port_bound(test.port):
           self.__write_intermediate_results(test.name, "port " + str(test.port) + " was not released by stop")
-          self.__forciblyEndPortBoundProcesses()
+          self.__forciblyEndPortBoundProcesses(out, err)
           time.sleep(5)
           if self.__is_port_bound(test.port):
             err.write( textwrap.dedent("""
@@ -686,7 +686,7 @@ class Benchmarker:
 
           if self.__is_port_bound(test.port):
             self.__write_intermediate_results(test.name, "port " + str(test.port) + " was not released by stop")
-            self.__forciblyEndPortBoundProcesses()
+            self.__forciblyEndPortBoundProcesses(out, err)
             time.sleep(5)
             if self.__is_port_bound(test.port):
               err.write( textwrap.dedent("""
@@ -706,7 +706,7 @@ class Benchmarker:
           {trace}
           """.format(name=test.name, err=e, trace=sys.exc_info()[:2])) )
           err.flush()
-          self.__forciblyEndPortBoundProcesses()
+          self.__forciblyEndPortBoundProcesses(out, err)
           time.sleep(5)
           if self.__is_port_bound(test.port):
             err.write( textwrap.dedent("""
@@ -724,7 +724,7 @@ class Benchmarker:
 
         if self.__is_port_bound(test.port):
           self.__write_intermediate_results(test.name, "port " + str(test.port) + " was not released by stop")
-          self.__forciblyEndPortBoundProcesses()
+          self.__forciblyEndPortBoundProcesses(out, err)
           time.sleep(5)
           if self.__is_port_bound(test.port):
             err.write( textwrap.dedent("""
@@ -787,7 +787,7 @@ class Benchmarker:
   # End __is_port_bound
   ############################################################
 
-  def __forciblyEndPortBoundProcesses(self):
+  def __forciblyEndPortBoundProcesses(self, out, err):
     p = subprocess.Popen(['sudo', 'netstat', '-lnp'], stdout=subprocess.PIPE)
     out, err = p.communicate()
     for line in out.splitlines():
@@ -797,10 +797,24 @@ class Benchmarker:
         port = int(port[len(port) - 1].strip())
         if port > 6000:
           try:
-            pid = int(splitline[6].split('/')[0].strip())
-            os.kill(pid, 15)
+            pid = splitline[6].split('/')[0].strip()
+            ps = subprocess.Popen(['ps','p',pid], stdout=subprocess.PIPE)
+            # Store some info about this process
+            proc = ps.communicate()
+            os.kill(int(pid), 15)
+            # Check that PID again
+            ps = subprocess.Popen(['ps','p',pid], stdout=subprocess.PIPE)
+            dead = ps.communicate()
+            if dead in proc:
+              os.kill(int(pid), 9)
+
+
           except OSError:
-            print "Error killing a pid"
+            out.write( textwrap.dedent("""
+              -----------------------------------------------------
+                Error: Could not kill pid {pid}
+              -----------------------------------------------------
+              """.format(pid=str(pid)) )
             # This is okay; likely we killed a parent that ended
             # up automatically killing this before we could.
             pass

@@ -807,14 +807,12 @@ class Benchmarker:
             dead = ps.communicate()
             if dead in proc:
               os.kill(int(pid), 9)
-
-
           except OSError:
             out.write( textwrap.dedent("""
               -----------------------------------------------------
                 Error: Could not kill pid {pid}
               -----------------------------------------------------
-              """.format(pid=str(pid)) )
+              """.format(pid=str(pid))) )
             # This is okay; likely we killed a parent that ended
             # up automatically killing this before we could.
 

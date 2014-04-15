@@ -802,6 +802,8 @@ class Benchmarker:
             # Store some info about this process
             proc = ps.communicate()
             os.kill(int(pid), 15)
+            # Sleep for 10 sec; kill can be finicky
+            time.sleep(10)
             # Check that PID again
             ps = subprocess.Popen(['ps','p',pid], stdout=subprocess.PIPE)
             dead = ps.communicate()

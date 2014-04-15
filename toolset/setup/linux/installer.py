@@ -147,7 +147,19 @@ class Installer:
     #
     # Haskell
     #
-    self.__run_command("sudo apt-get install ghc cabal-install", True)
+    self.__download("https://www.haskell.org/ghc/dist/7.8.2/ghc-7.8.2-x86_64-unknown-linux-deb7.tar.bz2")
+    self.__run_command("bunzip2 ghc-7.8.2-x86_64-unknown-linux-deb7.tar.bz2")
+    self.__run_command("tar xf ghc-7.8.2-x86_64-unknown-linux-deb7.tar")
+    self.__run_command("./configure" cwd="ghc-7.8.2")
+    self.__run_command("sudo make install" cwd="ghc-7.8.2")
+
+    #
+    # Cabal
+    #
+    self.__run_command("sudo apt-get install cabal-install")
+    self.__run_command("cabal update")
+    self.__run_command("cabal install cabal-install")
+    self.__run_command("sudo mv ~/.cabal/bin/cabal /usr/bin/")
 
     #
     # RingoJs

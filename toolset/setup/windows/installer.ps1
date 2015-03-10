@@ -12,7 +12,7 @@ $pyparallel_installer_file= "pyparallel-3.3.$pyparallel_build.amd64.msi"
 $pyparallel_version       = "33"
 $wincache_installer_file  = "wincache-1.3.4-5.4-nts-vc9-x86.exe"
 $wincache_installer_path  = "wincache-1.3.4/$wincache_installer_file"
-$go_installer_file        = "go1.2.windows-amd64.msi"
+$go_installer_file        = "go1.4.2.windows-amd64.msi"
 $jre_installer_file       = "jdk-7u75-windows-x64.exe"
 $jdk_installer_file       = "jdk-7u75-windows-x64.exe"
 $jdk_master_hash          = "ff2cb8fa5b9703741d2df35ea62e0009"
@@ -86,7 +86,7 @@ appcmd set config -section:system.webServer/serverRuntime /appConcurrentRequestL
 # URL Rewrite
 $rewrite_url = "http://download.microsoft.com/download/6/7/D/67D80164-7DD0-48AF-86E3-DE7A182D6815/rewrite_2.0_rtw_x64.msi"
 $rewrite_local = "$workdir\rewrite_2.0_rtw_x64.msi"
-(New-Object System.Net.WebClient).DownloadFile($rewrite_url, $rewrite_local)
+#(New-Object System.Net.WebClient).DownloadFile($rewrite_url, $rewrite_local)
 Start-Process "msiexec" "/i $rewrite_local /passive" -Wait
 
 #
@@ -97,14 +97,14 @@ Write-Host "`nInstalling .NET build tools...`n"
 # .NET Framework 4.5 SDK
 $sdktools_url = "http://download.microsoft.com/download/F/1/3/F1300C9C-A120-4341-90DF-8A52509B23AC/standalonesdk/sdksetup.exe"
 $sdktools_local = "$workdir\sdksetup.exe"
-(New-Object System.Net.WebClient).DownloadFile($sdktools_url, $sdktools_local)
+#(New-Object System.Net.WebClient).DownloadFile($sdktools_url, $sdktools_local)
 Start-Process "$workdir\sdksetup.exe" "/features OptionId.NetFxSoftwareDevelopmentKit /q /layout $workdir\sdksetup" -Wait
 Start-Process "msiexec" "/i $workdir\sdksetup\Redistributable\4.5.50710\sdk_tools4.msi VSEXTUI=1" -Wait
 
 # Web Deploy 3.0
 $webdeploy_url = "http://download.microsoft.com/download/1/B/3/1B3F8377-CFE1-4B40-8402-AE1FC6A0A8C3/WebDeploy_amd64_en-US.msi"
 $webdeploy_local = "$workdir\WebDeploy_amd64_en-US.msi"
-(New-Object System.Net.WebClient).DownloadFile($webdeploy_url, $webdeploy_local)
+#(New-Object System.Net.WebClient).DownloadFile($webdeploy_url, $webdeploy_local)
 Start-Process "msiexec" "/i $webdeploy_local /passive" -Wait
 
 #
@@ -113,7 +113,7 @@ Start-Process "msiexec" "/i $webdeploy_local /passive" -Wait
 Write-Host "Installing node.js...`n"
 $node_installer_url = "http://nodejs.org/dist/$node_installer_path"
 $node_installer_local = "$workdir\$node_installer_file"
-(New-Object System.Net.WebClient).DownloadFile($node_installer_url, $node_installer_local)
+#(New-Object System.Net.WebClient).DownloadFile($node_installer_url, $node_installer_local)
 
 Start-Process $node_installer_local '/passive' -Wait
 $env:Path += ";C:\Program Files\nodejs"; [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
@@ -124,7 +124,7 @@ $env:Path += ";C:\Program Files\nodejs"; [Environment]::SetEnvironmentVariable("
 Write-Host "Installing Python...`n"
 $python_installer_url = "http://www.python.org/ftp/python/$python_installer_path"
 $python_installer_local = "$workdir\$python_installer_file"
-(New-Object System.Net.WebClient).DownloadFile($python_installer_url, $python_installer_local)
+#(New-Object System.Net.WebClient).DownloadFile($python_installer_url, $python_installer_local)
 
 Start-Process $python_installer_local '/passive' -Wait
 $env:Path += ";C:\Python$python_version"; [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
@@ -135,8 +135,7 @@ $env:Path += ";C:\Python$python_version"; [Environment]::SetEnvironmentVariable(
 Write-Host "Installing PyParallel...`n"
 $pyparallel_installer_url = "http://download.pyparallel.org/$pyparallel_installer_file"
 $pyparallel_installer_local = "$workdir\$pyparallel_installer_file"
-
-(New-Object System.Net.WebClient).DownloadFile($pyparallel_installer_url, $pyparallel_installer_local)
+#(New-Object System.Net.WebClient).DownloadFile($pyparallel_installer_url, $pyparallel_installer_local)
 
 # Note that we don't add C:\PyParallel33 to the PATH like we do with
 # everything else.  This is because PyParallel is indistinguishable from a
@@ -148,39 +147,6 @@ Start-Process $pyparallel_installer_local '/passive' -Wait
 # PHP
 #
 Write-Host "Installing PHP..."
-
-# Locate current PHP 5.4 release
-Write-Host "Looking for current PHP 5.4 release"
-$php_download_page_url = 'http://windows.php.net/download/'
-$php_download_page_file = [IO.Path]::GetTempFileName()
-Write-Host "Downloading from $php_download_page_url into $php_download_page_file"
-Try {
-    (New-Object System.Net.WebClient).DownloadFile($php_download_page_url, $php_download_page_file)
-} Catch {
-    Write-Host "ERROR: Could not download from $php_download_page_url."
-    Write-Host $_.Exception.Message
-    Exit 1
-}
-$file = (cat $php_download_page_file) -join ""
-if ($file -match '(?s)h4 id="php-5.4-nts-VC9-x86".*?href="/downloads/releases/(.*?)">Zip</a>') {
-    $php_installer_file = $matches[1]
-    $php_installer_url = "http://windows.php.net/downloads/releases/$php_installer_file"
-    Write-Host "Current PHP 5.4 release found at $php_installer_url"
-}
-else {
-    Write-Host "ERROR: Current PHP release was not found. Aborting."
-    Exit 1
-}
-
-# Download PHP
-$php_installer_local = "$workdir\$php_installer_file"
-Try {
-    (New-Object System.Net.WebClient).DownloadFile($php_installer_url, $php_installer_local)
-} Catch {
-    Write-Host "ERROR: Could not download from $php_installer_url. "
-    Write-Host $_.Exception.Message
-    Exit 1
-}
 
 # Install PHP
 $php = "C:\PHP"
@@ -215,7 +181,8 @@ Set-Content "c:\inetpub\wwwroot\phpinfo.php" "<?php phpinfo(); ?>"
 # wincache
 $wincache_url = "http://heanet.dl.sourceforge.net/project/wincache/$wincache_installer_path"
 $wincache_local = "$workdir\$wincache_installer_file"
-(New-Object System.Net.WebClient).DownloadFile($wincache_url, $wincache_local)
+#(New-Object System.Net.WebClient).DownloadFile($wincache_url, $wincache_local)
+
 Start-Process $wincache_local "/q /T:$php\ext" -Wait
 Move-Item "$php\ext\wincache*" "c:\inetpub\wwwroot"
 Set-ItemProperty "c:\inetpub\wwwroot\wincache.php" -name IsReadOnly -value $false
@@ -226,7 +193,7 @@ Add-Content $phpini "extension=php_wincache.dll"
 # composer
 $composer_url = "https://getcomposer.org/Composer-Setup.exe"
 $composer_local = "$workdir\Composer-Setup.exe"
-(New-Object System.Net.WebClient).DownloadFile($composer_url, $composer_local)
+#(New-Object System.Net.WebClient).DownloadFile($composer_url, $composer_local)
 Start-Process $composer_local "/silent" -Wait
 $env:Path += ";C:\ProgramData\Composer\bin"; [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
 
@@ -238,7 +205,7 @@ Write-Host ""
 Write-Host "Installing Go...`n"
 $go_url = "http://go.googlecode.com/files/$go_installer_file"
 $go_local = "$workdir\$go_installer_file"
-(New-Object System.Net.WebClient).DownloadFile($go_url, $go_local)
+#(New-Object System.Net.WebClient).DownloadFile($go_url, $go_local)
 Start-Process $go_local "/passive" -Wait
 $env:Path += ";C:\Go\bin"; [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
 
@@ -266,16 +233,7 @@ Write-Host "Installing JDK...`n"
 $jdk_url = "http://download.pyparallel.org/$jdk_installer_file"
 $jdk_local = "$workdir\$jdk_installer_file"
 $jdk_dir = "C:\Java\jdk"
-(New-Object System.Net.WebClient).DownloadFile($jdk_url, $jdk_local)
-
-$jdk_local_hash = GetMd5FileHash($jdk_local)
-if ($jdk_master_hash -ne $jdk_local_hash)
-{
-    Write-Host $jdk_master_hash
-    Write-Host $jdk_local_hash
-    Write-Host "JDK file checksum mismatch. Aborting!"
-    Exit 1
-}
+#(New-Object System.Net.WebClient).DownloadFile($jdk_url, $jdk_local)
 
 Start-Process $jdk_local "/s INSTALLDIR=$jdk_dir" -Wait
 $env:Path += ";$jdk_dir\bin"; [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
@@ -286,7 +244,7 @@ Write-Host "Installing Resin...`n"
 $resin_url = "http://www.caucho.com/download/$resin_installer_file"
 $resin_local = "$workdir\$resin_installer_file"
 $resin_dir = "C:\Java\resin"
-(New-Object System.Net.WebClient).DownloadFile($resin_url, $resin_local)
+#(New-Object System.Net.WebClient).DownloadFile($resin_url, $resin_local)
 [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
 [System.IO.Compression.ZipFile]::ExtractToDirectory($resin_local, $workdir) | Out-Null
 Move-Item "$workdir\$resin_version" $resin_dir
@@ -310,7 +268,7 @@ Write-Host "Installing Maven...`n"
 $maven_url = "http://mirror.cc.columbia.edu/pub/software/apache/maven/$maven_installer_path"
 $maven_local = "$workdir\$maven_installer_file"
 $maven_dir = "C:\Java\maven"
-(New-Object System.Net.WebClient).DownloadFile($maven_url, $maven_local)
+#(New-Object System.Net.WebClient).DownloadFile($maven_url, $maven_local)
 [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
 [System.IO.Compression.ZipFile]::ExtractToDirectory($maven_local, $workdir) | Out-Null
 Move-Item "$workdir\$maven_version" $maven_dir
@@ -323,7 +281,7 @@ cinst scala -version $scala_version
 $play_url = "http://downloads.typesafe.com/play/$play_version/$play_installer_file"
 $play_local = "$workdir\$play_installer_file"
 $play_dir = "C:\Java\play"
-(New-Object System.Net.WebClient).DownloadFile($play_url, $play_local)
+#(New-Object System.Net.WebClient).DownloadFile($play_url, $play_local)
 [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
 [System.IO.Compression.ZipFile]::ExtractToDirectory($play_local, $workdir) | Out-Null
 Move-Item "$workdir\play-$play_version" $play_dir
@@ -334,7 +292,7 @@ $sbt_installer_file = "sbt-$sbt_version.zip"
 $sbt_url = "http://dl.bintray.com/sbt/native-packages/sbt/$sbt_version/$sbt_installer_file"
 $sbt_local = "$workdir\$sbt_installer_file"
 $sbt_dir = "C:\Java\sbt"
-(New-Object System.Net.WebClient).DownloadFile($sbt_url, $sbt_local)
+#(New-Object System.Net.WebClient).DownloadFile($sbt_url, $sbt_local)
 [System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
 [System.IO.Compression.ZipFile]::ExtractToDirectory($sbt_local, $workdir) | Out-Null
 Move-Item "$workdir\sbt" $sbt_dir
@@ -352,7 +310,7 @@ New-NetFirewallRule -DisplayName "HTTP 8080" -Action Allow -Direction Inbound -L
 Write-Host "Installing Mercurial...`n"
 $hg_installer_url = "https://bitbucket.org/tortoisehg/files/downloads/$mercurial_installer_file"
 $hg_installer_local = "$workdir\$mercurial_installer_file"
-(New-Object System.Net.WebClient).DownloadFile($hg_installer_url, $hg_installer_local)
+#(New-Object System.Net.WebClient).DownloadFile($hg_installer_url, $hg_installer_local)
 
 Start-Process $hg_installer_local '/passive' -Wait
 $env:Path += ";C:\Program Files\Mercurial"; [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
@@ -363,9 +321,9 @@ $env:Path += ";C:\Program Files\Mercurial"; [Environment]::SetEnvironmentVariabl
 Write-Host "Installing Cygwin...`n"
 $cygwin_installer_url = "http://cygwin.com/$cygwin_installer_file"
 $cygwin_installer_dir = $workdir + "\cygwin-installer"
-New-Item -Path $cygwin_installer_dir -Type directory -Force | Out-Null
+#New-Item -Path $cygwin_installer_dir -Type directory -Force | Out-Null
 $cygwin_installer_local = "$cygwin_installer_dir\$cygwin_installer_file"
-(New-Object System.Net.WebClient).DownloadFile($cygwin_installer_url, $cygwin_installer_local)
+#(New-Object System.Net.WebClient).DownloadFile($cygwin_installer_url, $cygwin_installer_local)
 
 $cygwin_install_dir = "C:\Cygwin"
 Start-Process $cygwin_installer_local "-q -n -l $cygwin_installer_dir -s http://mirrors.kernel.org/sourceware/cygwin/ -R $cygwin_install_dir -P openssh" -WorkingDirectory "$cygwin_installer_dir" -Wait -RedirectStandardOutput $cygwin_installer_dir\install.log

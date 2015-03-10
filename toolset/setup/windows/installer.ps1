@@ -7,14 +7,17 @@ $node_installer_path      = "v0.10.13/x64/$node_installer_file"
 $python_installer_file    = "python-2.7.5.amd64.msi"
 $python_installer_path    = "2.7.5/$python_installer_file"
 $python_version           = "27"
+$pyparallel_build         = "99482"
+$pyparallel_installer_file= "pyparallel-3.3.$pyparallel_build.amd64.msi"
+$pyparallel_version       = "33"
 $wincache_installer_file  = "wincache-1.3.4-5.4-nts-vc9-x86.exe"
 $wincache_installer_path  = "wincache-1.3.4/$wincache_installer_file"
-$go_installer_file        = "go1.2rc3.windows-amd64.msi"
-$jre_installer_file       = "jre-7u25-windows-x64.exe"
-$jdk_installer_file       = "jdk-7u45-windows-x64.exe"
-$jdk_master_hash          = "943527ed9111cbb746d4ab2bb2c31cd6" 
+$go_installer_file        = "go1.2.windows-amd64.msi"
+$jre_installer_file       = "jdk-7u75-windows-x64.exe"
+$jdk_installer_file       = "jdk-7u75-windows-x64.exe"
+$jdk_master_hash          = "ff2cb8fa5b9703741d2df35ea62e0009"
 # http://www.oracle.com/technetwork/java/javase/downloads/java-se-binaries-checksum-1956892.html
-$resin_version            = "resin-4.0.36"
+$resin_version            = "resin-4.0.41"
 $resin_installer_file     = "$resin_version.zip"
 $ant_version              = "apache-ant-1.9.2"
 $ant_installer_file       = "$ant_version-bin.zip"
@@ -24,6 +27,7 @@ $maven_installer_path     = "maven-3/3.0.5/binaries/$maven_installer_file"
 $scala_version            = "2.10.2"
 $play_version             = "2.2.0"
 $play_installer_file      = "play-$play_version.zip"
+$sbt_version              = "0.13.5"
 $mercurial_installer_file = "mercurial-2.6.1-x64.msi"
 $cygwin_installer_file    = "setup-x86_64.exe"
 
@@ -124,6 +128,21 @@ $python_installer_local = "$workdir\$python_installer_file"
 
 Start-Process $python_installer_local '/passive' -Wait
 $env:Path += ";C:\Python$python_version"; [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
+
+#
+# PyParallel
+#
+Write-Host "Installing PyParallel...`n"
+$pyparallel_installer_url = "http://download.pyparallel.org/$pyparallel_installer_file"
+$pyparallel_installer_local = "$workdir\$pyparallel_installer_file"
+
+(New-Object System.Net.WebClient).DownloadFile($pyparallel_installer_url, $pyparallel_installer_local)
+
+# Note that we don't add C:\PyParallel33 to the PATH like we do with
+# everything else.  This is because PyParallel is indistinguishable from a
+# normal Python installation in terms of the binaries that are shipped (i.e.
+# python.exe, python33.dll, etc).
+Start-Process $pyparallel_installer_local '/passive' -Wait
 
 #
 # PHP
@@ -240,7 +259,11 @@ Write-Host "Installing Java...`n"
 
 # jdk
 Write-Host "Installing JDK...`n"
-$jdk_url = "http://ghaffarian.net/downloads/Java/JDK/$jdk_installer_file"
+# trent: switching to a server I control where I can ensure the JDK file isn't
+# removed; the ghaffarian.net site appears to only keep the latest one around,
+# which blows up the installer when we get a 404 trying to GET a previous one.
+#$jdk_url = "http://ghaffarian.net/downloads/Java/JDK/$jdk_installer_file"
+$jdk_url = "http://download.pyparallel.org/$jdk_installer_file"
 $jdk_local = "$workdir\$jdk_installer_file"
 $jdk_dir = "C:\Java\jdk"
 (New-Object System.Net.WebClient).DownloadFile($jdk_url, $jdk_local)
@@ -305,6 +328,17 @@ $play_dir = "C:\Java\play"
 [System.IO.Compression.ZipFile]::ExtractToDirectory($play_local, $workdir) | Out-Null
 Move-Item "$workdir\play-$play_version" $play_dir
 $env:Path += ";$play_dir"; [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
+
+# sbt
+$sbt_installer_file = "sbt-$sbt_version.zip"
+$sbt_url = "http://dl.bintray.com/sbt/native-packages/sbt/$sbt_version/$sbt_installer_file"
+$sbt_local = "$workdir\$sbt_installer_file"
+$sbt_dir = "C:\Java\sbt"
+(New-Object System.Net.WebClient).DownloadFile($sbt_url, $sbt_local)
+[System.Reflection.Assembly]::LoadWithPartialName("System.IO.Compression.FileSystem") | Out-Null
+[System.IO.Compression.ZipFile]::ExtractToDirectory($sbt_local, $workdir) | Out-Null
+Move-Item "$workdir\sbt" $sbt_dir
+$env:Path += ";$sbt_dir\bin"; [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
 
 #
 # Firewall
